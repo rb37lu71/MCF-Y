@@ -24,19 +24,26 @@ _youtube = build('youtube', 'v3', developerKey=api_key)
 def upload_file():
     files_list = os.listdir("./uploads")
     if request.method == 'POST':
+        
         if request.form['submit_btn'] == "Download":
             path = "./uploads/"
             return send_file(path + request.form['file'],
                              download_name=request.form['file'],
                              as_attachment=True)
-        elif request.form['submit_btn'] == "Upload":
-            f = request.files['file']
-            f.save('./uploads/' + secure_filename(f.filename))
+            
+            
+        elif request.form['submit_btn'] == "Convert":
+            crawling_and_convert(_youtube, request.form['file'])
+            return render_template('upload.html', files=files_list)
+        
+        
         elif request.form['submit_btn'] == "Delete":
             path = "./uploads/"
             os.remove(path + "{}".format(request.form['file']))
             files_list = os.listdir("./uploads")
             return render_template('upload.html', files=files_list)
+        
+        
     return render_template('upload.html', files=files_list)
 
 
@@ -113,20 +120,16 @@ def crawling_and_convert(youtube, video_id):
 
     title = get_video_title(_youtube, video_id)
     print(title)
+    if len(title) > 50:
+        title = title[0:49]
 
     df = pandas.DataFrame(comments)
-    df.to_csv(title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w')
+    df.to_csv('uploads/' + title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w')
 
     print("convert to csv success")
 
 
 if __name__ == "__main__":
-    arr = ['xiSoqCtVd4A', 'co_pF1r9ohk', 'w8_19jUMqW0']
-
-    # app.run(debug=True)
     app.run(debug=True)
 
-    # for video in arr:
-    # print(get_video_title(_youtube, video))
-    # crawling_and_convert(_youtube, video)
 
