@@ -1,0 +1,26 @@
+<html>
+<body>
+<br><br><br><br>
+<center>
+    <form action="/" method="POST" enctype="multipart/form-data">
+        <input type="text" name="file" style="background-color: white;"/><br><br><br><br>
+
+        <div id="sub">
+            <input type="submit" name="submit_btn" value="Convert"/>
+            <input type="submit" name="submit_btn" value="Download"/>
+            <input type="submit" name="submit_btn" value="Delete"/><br><br>
+            <input type="submit" name="submit_btn" value="Refresh"/>
+        </div>
+        <ul>
+            <br><br><br><br>
+            <div style="font-size:1.6em; color:rgb(175, 184, 178);">
+                File list <br><br>
+                {% for n in files %}
+                <li>{{n}}</li>
+                {% endfor %}
+            </div>
+        </ul>
+    </form>
+</center>
+</body>
+</html>
