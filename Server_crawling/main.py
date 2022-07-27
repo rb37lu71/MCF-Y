@@ -34,6 +34,7 @@ def upload_file():
             
         elif request.form['submit_btn'] == "Convert":
             crawling_and_convert(_youtube, request.form['file'])
+            print("good")
             return render_template('upload.html', files=files_list)
         
         
@@ -41,6 +42,10 @@ def upload_file():
             path = "./uploads/"
             os.remove(path + "{}".format(request.form['file']))
             files_list = os.listdir("./uploads")
+            return render_template('upload.html', files=files_list)
+    
+    
+        elif request.form['submit_btn'] == 'Refresh':    
             return render_template('upload.html', files=files_list)
         
         
@@ -130,6 +135,6 @@ def crawling_and_convert(youtube, video_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
 
 
