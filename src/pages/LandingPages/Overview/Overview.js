@@ -2,6 +2,7 @@ import React from 'react'
 
 // Component
 import { Button, Container, Box, Typography, Grid, TextField } from '@mui/material';
+import { Link } from 'react-router-dom';
 import Header from 'components/Header'
 import Footer from 'components/Footer'
 
@@ -48,11 +49,12 @@ function Overview() {
                 <Box 
                     textAlign='center'
                     marginTop='30px'>
-
-                    <ColorButton
-                        variant='contained'>
-                        Get Started
-                    </ColorButton>
+                    <Link to='/mcfy'>
+                        <ColorButton
+                            variant='contained'>
+                            Get Started
+                        </ColorButton>
+                    </Link>
                 </Box>
             </Container>
             <Grid 
@@ -84,10 +86,12 @@ function Overview() {
                             variant="outlined"
                             fullWidth />
                         <br/><br/>
-                        <ColorButton   
-                            variant="contained">
-                            GET STARTED
-                        </ColorButton>
+                        <Link to='/mcfy'>
+                            <ColorButton   
+                                variant="contained">
+                                GET STARTED
+                            </ColorButton>
+                        </Link>
                     </Box>
                 </Grid>           
             </Grid>
@@ -169,10 +173,12 @@ function Overview() {
                         악플 없는 건강한 인터넷 문화를 꿈꿉니다
                     </Typography>
                     <br/><br/>
-                    <ColorButton   
-                        variant="contained">
-                        Contact
-                    </ColorButton>
+                    <Link to='/contact'>
+                        <ColorButton   
+                            variant="contained">
+                            Contact
+                        </ColorButton>
+                    </Link>
                 </Box>
             </Grid>
             <Footer />
