@@ -2,6 +2,7 @@
 
 import pandas
 import re
+from flask_cors import CORS
 from googleapiclient.discovery import build
 
 from flask import Flask, render_template, request, send_file
@@ -14,6 +15,7 @@ except:
 import os
 
 app = Flask(__name__)
+CORS(app)
 
 api_key = 'AIzaSyCl4YFAaMTRyGEoHW-6KRGQrJNqhBaeOyk'
 _youtube = build('youtube', 'v3', developerKey=api_key)
@@ -25,28 +27,35 @@ def upload_file():
     files_list = os.listdir("./uploads")
     if request.method == 'POST':
         
-        if request.form['submit_btn'] == "Download":
-            path = "./uploads/"
-            return send_file(path + request.form['file'],
-                             download_name=request.form['file'],
-                             as_attachment=True)
+        # if request.form['submit_btn'] == "Download":
+            # path = "./uploads/"
+            # return send_file(path + request.form['file'],
+            #                  download_name=request.form['file'],
+            #                  as_attachment=True)
             
             
-        elif request.form['submit_btn'] == "Convert":
-            crawling_and_convert(_youtube, request.form['file'])
-            print("good")
-            return render_template('upload.html', files=files_list)
+        # elif request.form['submit_btn'] == "Convert":
+        youtube_link = request.form['file']
+        youtube_link = youtube_link[32:43]
+        print(youtube_link)
+        crawling_and_convert(_youtube, youtube_link)
+        fileName = youtube_link + '.csv'
+        path = "./uploads/"
+        return send_file(path + fileName,
+                            download_name=(fileName),
+                            as_attachment=True)
+        # return render_template('upload.html', files=files_list)
         
         
-        elif request.form['submit_btn'] == "Delete":
-            path = "./uploads/"
-            os.remove(path + "{}".format(request.form['file']))
-            files_list = os.listdir("./uploads")
-            return render_template('upload.html', files=files_list)
+        # elif request.form['submit_btn'] == "Delete":
+        #     path = "./uploads/"
+        #     os.remove(path + "{}".format(request.form['file']))
+        #     files_list = os.listdir("./uploads")
+        #     return render_template('upload.html', files=files_list)
     
     
-        elif request.form['submit_btn'] == 'Refresh':    
-            return render_template('upload.html', files=files_list)
+        # elif request.form['submit_btn'] == 'Refresh':    
+        #     return render_template('upload.html', files=files_list)
         
         
     return render_template('upload.html', files=files_list)
@@ -105,17 +114,17 @@ def get_comment_threads(youtube, video_id):
     return comment_list
 
 
-def get_video_title(youtube, video_id):
-    results = youtube.videos().list(
-        part="snippet",
-        id=video_id
-    ).execute()
+# def get_video_title(youtube, video_id):
+#     results = youtube.videos().list(
+#         part="snippet",
+#         id=video_id
+#     ).execute()
 
-    title = ""
-    for item in results['items']:
-        title = item['snippet']['title']
+#     title = ""
+#     for item in results['items']:
+#         title = item['snippet']['title']
 
-    return re.sub('[\\\/:*?"<>|]', ' ', title)
+#     return re.sub('[\\\/:*?"<>|]', ' ', title)
 
 
 def crawling_and_convert(youtube, video_id):
@@ -123,18 +132,17 @@ def crawling_and_convert(youtube, video_id):
 
     print("crawling success")
 
-    title = get_video_title(_youtube, video_id)
+    # title = get_video_title(_youtube, video_id)
+    title = video_id
     print(title)
-    if len(title) > 50:
-        title = title[0:49]
 
     df = pandas.DataFrame(comments)
-    df.to_csv('uploads/' + title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w')
+    df.to_csv('uploads/' + title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w', encoding="utf-8-sig")
 
     print("convert to csv success")
 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
-
+    
 
