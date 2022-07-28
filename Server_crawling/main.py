@@ -7,7 +7,7 @@ from keras_preprocessing.sequence import pad_sequences
 from soynlp.normalizer import *
 from flask_cors import CORS
 from googleapiclient.discovery import build
-from kiwipiepy import Kiwi
+# from kiwipiepy import Kiwi
 from keras.models import load_model
 
 from flask import Flask, render_template, request, send_file
@@ -38,26 +38,26 @@ def upload_file():
         crawling_and_convert(_youtube, youtube_link)
         
         fileName = youtube_link + '.csv'
-        f = open("./uploads/" + fileName)
-        model = load_model('CommentClassification.h5')
-        kiwi = Kiwi()
-        sent=[]
-        while True:
-            line = f.readline()
-            if not line:
-                break
-            text = line.split(",")[-1]
-            text = cleanse(text)
-            text=repeat_normalize(text,num_repeats = 2)
-            sent.append(text)
+        # f = open("./uploads/" + fileName)
+        # model = load_model('CommentClassification.h5')
+        # kiwi = Kiwi()
+        # sent=[]
+        # while True:
+        #     line = f.readline()
+        #     if not line:
+        #         break
+        #     text = line.split(",")[-1]
+        #     text = cleanse(text)
+        #     text=repeat_normalize(text,num_repeats = 2)
+        #     sent.append(text)
             
-        token = Tokenizer(len(sent))
-        token.fit_on_texts(sent)
-        text = token.texts_to_sequences(sent)
-        text = pad_sequences(text, 75)    
-        #특수문자 제거, spacing 제거, 띄어쓰기 
-        pred = model.predict(text)
-        # for i in pred:
+        # token = Tokenizer(len(sent))
+        # token.fit_on_texts(sent)
+        # text = token.texts_to_sequences(sent)
+        # text = pad_sequences(text, 75)    
+        # #특수문자 제거, spacing 제거, 띄어쓰기 
+        # pred = model.predict(text)
+        # # for i in pred:
 
         
         path = "./uploads/"
@@ -136,7 +136,7 @@ def crawling_and_convert(youtube, video_id):
     print(title)
 
     model = load_model('CommentClassification.h5')
-    kiwi = Kiwi()
+    # kiwi = Kiwi()
     sent=[]
     malicious =[]
     for comment in comments:
@@ -146,19 +146,22 @@ def crawling_and_convert(youtube, video_id):
         text=repeat_normalize(text,num_repeats = 2)
         sent.append(text)
         
-        token = Tokenizer(len(sent))
-        token.fit_on_texts(sent)
-        text = token.texts_to_sequences(sent)
-        text = pad_sequences(text, 75)    
-        #특수문자 제거, spacing 제거, 띄어쓰기 
-        pred = model.predict(text)
-        pred = pred[0].tolist()
-        if pred[1] < pred[0]:
-            malicious.append(comment)
-    
-    print(malicious)
+    token = Tokenizer(len(sent))
+    token.fit_on_texts(sent)
+    text = token.texts_to_sequences(sent)
+    text = pad_sequences(text, 75)    
+    #특수문자 제거, spacing 제거, 띄어쓰기 
+    pred = model.predict(text)
+    pred = pred.tolist()
 
-    df = pandas.DataFrame(comments)
+    for i in range(len(pred)):
+        if pred[i][0] < pred[i][1]:
+            malicious.append(comments[i])
+
+    
+    # print(malicious)
+
+    df = pandas.DataFrame(malicious)
     df.to_csv('uploads/' + title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w', encoding="utf-8-sig")
 
     print("convert to csv success")
