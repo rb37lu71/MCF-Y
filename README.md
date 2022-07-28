@@ -1,7 +1,6 @@
 # MCF-Y
 > Malicious Comment Filter - YouTube
 
-# Intro
 ## Topic
 > 몰입캠프 4주차 자유주제
 - 유튜브 링크를 입력하면 악플을 찾아내 csv로 만들어주는 서비스
