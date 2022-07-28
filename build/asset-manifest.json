@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/MCF-Y/static/css/main.c88591ae.css",
+    "main.js": "/MCF-Y/static/js/main.162b0ab5.js",
+    "index.html": "/MCF-Y/index.html",
+    "main.c88591ae.css.map": "/MCF-Y/static/css/main.c88591ae.css.map",
+    "main.162b0ab5.js.map": "/MCF-Y/static/js/main.162b0ab5.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c88591ae.css",
+    "static/js/main.162b0ab5.js"
+  ]
+}

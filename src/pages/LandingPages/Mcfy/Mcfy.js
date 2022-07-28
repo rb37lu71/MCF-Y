@@ -48,12 +48,13 @@ function Mcfy() {
 					marginTop='250px' 
 					paddingTop='100px'
 					paddingBottom='100px'
-					paddingRight='250px'
-					paddingLeft='250px'
+					paddingRight='500px'
+					paddingLeft='500px'
 					textAlign='center'>
 					<TextField 
 						id="outlined-basic" 
 						label="https://www.youtube.com/" 
+						color="grey"
 						variant="outlined"
 						value={url}
 						onChange={(event) => {
@@ -85,15 +86,8 @@ function Mcfy() {
 							window.URL.revokeObjectURL(blobUrl);
 						}}
 					>
-						v
+						MCF-Y start
 					</ColorButton>
-					<Typography 
-						variant='body1' 
-						gutterBottom component='div'
-						textAlign='center'
-						marginTop='50px'>
-						다운로드 링크
-					</Typography>
 				</Box>
 			</Grid>
             <Footer />
