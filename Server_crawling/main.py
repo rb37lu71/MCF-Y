@@ -2,8 +2,13 @@
 
 import pandas
 import re
+from keras_preprocessing.text import Tokenizer
+from keras_preprocessing.sequence import pad_sequences
+from soynlp.normalizer import *
 from flask_cors import CORS
 from googleapiclient.discovery import build
+from kiwipiepy import Kiwi
+from keras.models import load_model
 
 from flask import Flask, render_template, request, send_file
 
@@ -26,37 +31,39 @@ _youtube = build('youtube', 'v3', developerKey=api_key)
 def upload_file():
     files_list = os.listdir("./uploads")
     if request.method == 'POST':
-        
-        # if request.form['submit_btn'] == "Download":
-            # path = "./uploads/"
-            # return send_file(path + request.form['file'],
-            #                  download_name=request.form['file'],
-            #                  as_attachment=True)
-            
-            
-        # elif request.form['submit_btn'] == "Convert":
         youtube_link = request.form['file']
         youtube_link = youtube_link[32:43]
         print(youtube_link)
+        
         crawling_and_convert(_youtube, youtube_link)
+        
         fileName = youtube_link + '.csv'
+        f = open("./uploads/" + fileName)
+        model = load_model('CommentClassification.h5')
+        kiwi = Kiwi()
+        sent=[]
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            text = line.split(",")[-1]
+            text = cleanse(text)
+            text=repeat_normalize(text,num_repeats = 2)
+            sent.append(text)
+            
+        token = Tokenizer(len(sent))
+        token.fit_on_texts(sent)
+        text = token.texts_to_sequences(sent)
+        text = pad_sequences(text, 75)    
+        #특수문자 제거, spacing 제거, 띄어쓰기 
+        pred = model.predict(text)
+        # for i in pred:
+
+        
         path = "./uploads/"
         return send_file(path + fileName,
                             download_name=(fileName),
                             as_attachment=True)
-        # return render_template('upload.html', files=files_list)
-        
-        
-        # elif request.form['submit_btn'] == "Delete":
-        #     path = "./uploads/"
-        #     os.remove(path + "{}".format(request.form['file']))
-        #     files_list = os.listdir("./uploads")
-        #     return render_template('upload.html', files=files_list)
-    
-    
-        # elif request.form['submit_btn'] == 'Refresh':    
-        #     return render_template('upload.html', files=files_list)
-        
         
     return render_template('upload.html', files=files_list)
 
@@ -113,19 +120,11 @@ def get_comment_threads(youtube, video_id):
 
     return comment_list
 
-
-# def get_video_title(youtube, video_id):
-#     results = youtube.videos().list(
-#         part="snippet",
-#         id=video_id
-#     ).execute()
-
-#     title = ""
-#     for item in results['items']:
-#         title = item['snippet']['title']
-
-#     return re.sub('[\\\/:*?"<>|]', ' ', title)
-
+def cleanse(text):
+    pattern = re.compile(r'\s+')
+    text = re.sub(pattern," ",text)
+    text = re.sub('[^가-힣ㄱ-ㅎㅏ-ㅣa-zA-Z0-9]',' ',text)
+    return text
 
 def crawling_and_convert(youtube, video_id):
     comments = get_comment_threads(youtube, video_id)
@@ -136,6 +135,29 @@ def crawling_and_convert(youtube, video_id):
     title = video_id
     print(title)
 
+    model = load_model('CommentClassification.h5')
+    kiwi = Kiwi()
+    sent=[]
+    malicious =[]
+    for comment in comments:
+        line = comment[4]
+        text = line.split(",")[-1]
+        text = cleanse(text)
+        text=repeat_normalize(text,num_repeats = 2)
+        sent.append(text)
+        
+        token = Tokenizer(len(sent))
+        token.fit_on_texts(sent)
+        text = token.texts_to_sequences(sent)
+        text = pad_sequences(text, 75)    
+        #특수문자 제거, spacing 제거, 띄어쓰기 
+        pred = model.predict(text)
+        pred = pred[0].tolist()
+        if pred[1] < pred[0]:
+            malicious.append(comment)
+    
+    print(malicious)
+
     df = pandas.DataFrame(comments)
     df.to_csv('uploads/' + title + '.csv', header=['comment_id', 'author', 'date', 'like', 'text'], index=False, mode='w', encoding="utf-8-sig")
 
@@ -145,4 +167,3 @@ def crawling_and_convert(youtube, video_id):
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
     
-
