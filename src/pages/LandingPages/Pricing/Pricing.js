@@ -2,6 +2,7 @@ import React from 'react'
 
 // Component
 import { Button, Container, Box, Typography, Grid } from '@mui/material';
+import { Link } from 'react-router-dom';
 import Header from 'components/Header'
 import Footer from 'components/Footer'
 
@@ -40,10 +41,12 @@ function Pricing() {
                 <Box 
                     textAlign='center'
                     marginTop='30px'>
-                    <ColorButton
-                        variant='contained'>
-                        Get Started
-                    </ColorButton>
+                    <Link to='/mcfy'>
+                        <ColorButton
+                            variant='contained'>
+                            Get Started
+                        </ColorButton>
+                    </Link>
                 </Box>
             </Container>
             <Grid>
@@ -187,10 +190,12 @@ function Pricing() {
                     p={2} 
                     marginRight='100px'
                     textAlign='center'>
-                    <ColorButton   
-                        variant="contained">
-                        Contact
-                    </ColorButton>
+                    <Link to='/contact'>
+                        <ColorButton   
+                            variant="contained">
+                            Contact
+                        </ColorButton>
+                    </Link>
                 </Box>         
             </Grid>
         <Footer />

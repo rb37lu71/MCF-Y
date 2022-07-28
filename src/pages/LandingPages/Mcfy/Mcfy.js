@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 // Component
 import { Button, Container, Box, Typography, Grid, TextField } from '@mui/material';
@@ -19,6 +19,8 @@ const ColorButton = styled(Button)(({ theme }) => ({
 }));
 
 function Mcfy() {
+	const [url, setUrl] = useState('');
+
     return (
         <div>
             <Header />
@@ -53,10 +55,36 @@ function Mcfy() {
 						id="outlined-basic" 
 						label="https://www.youtube.com/" 
 						variant="outlined"
+						value={url}
+						onChange={(event) => {
+							setUrl(event.target.value);
+						}}
 						fullWidth />
 					<br/><br/><br/>
 					<ColorButton
-						variant="contained">
+						variant="contained"
+						disableElevation
+						onClick={async () => {
+							const formData = new FormData();
+							formData.append('file', url);
+
+							const res = await fetch('http://192.249.19.212:80', {
+								method: 'POST',
+								body: formData,
+								redirect: 'follow'
+							});
+
+							const blob = await res.blob();
+							const newBlob = new Blob([blob], {type: 'text/csv;charset=utf-8;'});
+							const blobUrl = window.URL.createObjectURL(newBlob);
+
+							const anchor = document.createElement('a');
+							anchor.href = blobUrl;
+							anchor.click();
+
+							window.URL.revokeObjectURL(blobUrl);
+						}}
+					>
 						v
 					</ColorButton>
 					<Typography 
